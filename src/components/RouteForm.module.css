@@ -57,12 +57,27 @@
 }
 
 .input1-container,
-.input2-container,
-.stop-container {
+.input2-container {
   color: #0a2342;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  margin-top: 1rem;
+  padding-left: 0;
+  width: 100%;
+}
+
+.stop-container {
+  flex-direction: row;
+  padding-left: 0;
+  height: auto;
+}
+
+.stop-container li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
   width: 100%;
 }
@@ -76,7 +91,7 @@
 
 .input {
   display: flex;
-  width: 100%;
+  flex: 1;
 }
 
 .input1-container input,
@@ -89,6 +104,10 @@
   border-radius: 5px;
   font-size: 0.8rem;
   display: inline;
+  width: 100%;
+}
+
+.stop-container input {
   width: 100%;
 }
 
@@ -125,10 +144,20 @@
   color: #fffdf7;
 }
 
-.stop-submit-btn {
+.add-stop-btn,
+.remove-stop-btn {
   background-color: transparent;
   border: none;
   color: #0a2342;
   cursor: pointer;
-  width: 20%;
+  margin: 0;
+  padding: 0;
+}
+
+.add-stop-btn {
+  padding-left: 0.8rem;
+}
+
+.remove-stop-btn {
+  padding-right: 0.8rem;
 }
