@@ -14,6 +14,16 @@
   font-style: normal;
 }
 
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -67,10 +77,31 @@
   width: 100%;
 }
 
+.form-container {
+  overflow: hidden;
+  transition: all 1s ease;
+}
+
+.route-form-container {
+  overflow: hidden;
+  animation: slideIn 400ms ease-in-out 0s 1 normal forwards;
+  transition: all 1s ease-in-out;
+}
+
+.form-visible {
+  max-height: 100rem;
+}
+
 .stop-container {
+  overflow: hidden;
+}
+
+.stops {
   flex-direction: row;
   padding-left: 0;
-  height: auto;
+  margin-bottom: 0;
+  overflow: hidden;
+  animation: slideIn 400ms ease-in-out 0s 1 normal forwards;
 }
 
 .stop-container li {
@@ -80,6 +111,10 @@
   align-items: center;
   margin-top: 1rem;
   width: 100%;
+}
+
+.stop-container li:first-of-type {
+  margin-top: 0;
 }
 
 .input1-container label,
@@ -125,8 +160,9 @@
 
 .btns button,
 .btns .add-stop {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   font-family: "poppinsregular", sans-serif;
+  font-size: 0.8rem;
   outline: none;
   background-color: #beff0a;
   color: #0a2342;
@@ -155,9 +191,9 @@
 }
 
 .add-stop-btn {
-  padding-left: 0.8rem;
+  padding-left: 0.5rem;
 }
 
 .remove-stop-btn {
-  padding-right: 0.8rem;
+  padding-right: 0.5rem;
 }

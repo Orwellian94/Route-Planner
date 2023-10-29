@@ -1,10 +1,12 @@
-import { React, useRef, useState, Fragment } from "react";
+import { React, useRef, useState, Fragment, useEffect } from "react";
 import styles from "./RouteForm.module.css";
 import KeyboardDoubleArrowDownRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowDownRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PlaceIcon from "@mui/icons-material/Place";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import "./google-places-autocomplete.css";
+
 import {
   GoogleMap,
   useJsApiLoader,
@@ -13,6 +15,43 @@ import {
 } from "@react-google-maps/api";
 
 const libraries = ["places"];
+
+const Map = () => {
+  const center = { lat: 42.4414, lng: 19.2624 };
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: "YOUR_API_KEY",
+    libraries: libraries,
+  });
+
+  if (!isLoaded) {
+    return (
+      <div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <GoogleMap
+      center={center}
+      zoom={15}
+      mapContainerStyle={{
+        width: "100%",
+        height: "100%",
+      }}
+      options={{
+        zoomControl: false,
+        streetViewControl: false,
+        mapTypeControl: false,
+        fullscreenControl: false,
+      }}
+    />
+  );
+};
+
+export { Map };
 
 const RouteForm = (props) => {
   const originRef = useRef(null);
@@ -26,6 +65,13 @@ const RouteForm = (props) => {
   ]);
   const [searchResult, setSearchResult] = useState("");
   const [selectedAddresses, setSelectedAddresses] = useState([]);
+  const [directionsRendererOptions, setDirectionsRendererOptions] = useState();
+
+  useEffect(() => {
+    if (!stopContainerVisible) {
+      setSelectedAddresses([]);
+    }
+  }, [stopContainerVisible]);
 
   const handleRouteSubmit = (e) => {
     e.preventDefault();
@@ -101,7 +147,6 @@ const RouteForm = (props) => {
 
   const waypoints = selectedAddresses.filter((address) => address);
 
-  // Create an array of waypoints for the DirectionsService
   const waypointLocations = waypoints.map((address) => ({
     location: address,
     stopover: true,
@@ -110,6 +155,25 @@ const RouteForm = (props) => {
   const filteredWaypointLocations = waypointLocations.filter(
     (waypoint) => waypoint.location !== ""
   );
+
+  const rendererOptions = {
+    polylineOptions: {
+      strokeColor: "#0a2342",
+      strokeOpacity: 0.8,
+      strokeWeight: 5,
+    },
+    markerOptions: {
+      icon: {
+        // eslint-disable-next-line no-undef
+        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+        fillColor: "#ff0000",
+        fillOpacity: 1,
+        strokeColor: "white",
+        strokeWeight: 1,
+        scale: 10,
+      },
+    },
+  };
 
   async function calculateRoute() {
     if (originRef.current.value === "" || destinationRef.current.value === "") {
@@ -124,9 +188,12 @@ const RouteForm = (props) => {
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
       waypoints: filteredWaypointLocations,
+      optimizeWaypoints: true,
     });
 
     setDirectionsRes(results);
+
+    setDirectionsRendererOptions(rendererOptions);
   }
 
   return (
@@ -146,7 +213,12 @@ const RouteForm = (props) => {
             fullscreenControl: false,
           }}
         >
-          {directionsRes && <DirectionsRenderer directions={directionsRes} />}
+          {directionsRes && (
+            <DirectionsRenderer
+              directions={directionsRes}
+              options={directionsRendererOptions}
+            />
+          )}
         </GoogleMap>
 
         <div className={styles.container}>
@@ -166,7 +238,10 @@ const RouteForm = (props) => {
           </div>
           <div className={styles["form-container"]}>
             {routeFormVisible && (
-              <form onSubmit={handleRouteSubmit}>
+              <form
+                onSubmit={handleRouteSubmit}
+                className={styles["route-form-container"]}
+              >
                 <div className={styles.inputs}>
                   <div className={styles["input1-container"]}>
                     <label>
@@ -185,7 +260,10 @@ const RouteForm = (props) => {
                     <label>
                       <PlaceIcon sx={{ color: "#beff0a" }} />
                     </label>
-                    <Autocomplete className={styles.input}>
+                    <Autocomplete
+                      className={styles.input}
+                      pac-container={{ backgroundColor: "#beff0a" }}
+                    >
                       <input
                         type="text"
                         placeholder="Destination"
@@ -195,54 +273,62 @@ const RouteForm = (props) => {
                     </Autocomplete>
                   </div>
                 </div>
+                {stopContainerVisible && (
+                  <div className={styles["stop-container"]}>
+                    <ul className={styles.stops}>
+                      {waypointInputList.map((singleWaypoint, index) => (
+                        <li key={index}>
+                          {waypointInputList && index > 0 && (
+                            <button
+                              className={styles["remove-stop-btn"]}
+                              onClick={() => handleWaypointRemove(index)}
+                            >
+                              <RemoveCircleIcon />
+                            </button>
+                          )}
+                          <Autocomplete
+                            className={styles.input}
+                            onPlaceChanged={() => onPlaceChanged(index)}
+                            onLoad={onLoad}
+                          >
+                            <input
+                              type="text"
+                              placeholder="Stopping place"
+                              required
+                            />
+                          </Autocomplete>
+                          {waypointInputList.length - 1 === index &&
+                            waypointInputList.length <= 4 && (
+                              <button
+                                type="submit"
+                                className={styles["add-stop-btn"]}
+                                onClick={handleWaypointAdd}
+                              >
+                                <AddCircleIcon />
+                              </button>
+                            )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <div className={styles.btns}>
-                  <button type="submit" onClick={calculateRoute}>
+                  <button
+                    type="submit"
+                    onClick={calculateRoute}
+                    className={`${styles["create-route-btn"]} ${
+                      stopContainerVisible ? styles["full-width"] : ""
+                    }`}
+                  >
                     Create Route
                   </button>
                   <span
                     className={styles["add-stop"]}
                     onClick={toggleStopVisibility}
                   >
-                    Add Stop
+                    {stopContainerVisible ? "Close" : "Add Stop"}
                   </span>
                 </div>
-                {stopContainerVisible && (
-                  <ul className={styles["stop-container"]}>
-                    {waypointInputList.map((singleWaypoint, index) => (
-                      <li key={index}>
-                        {waypointInputList && index > 0 && (
-                          <button
-                            className={styles["remove-stop-btn"]}
-                            onClick={() => handleWaypointRemove(index)}
-                          >
-                            <RemoveCircleIcon />
-                          </button>
-                        )}
-                        <Autocomplete
-                          className={styles.input}
-                          onPlaceChanged={() => onPlaceChanged(index)}
-                          onLoad={onLoad}
-                        >
-                          <input
-                            type="text"
-                            placeholder="Stopping place"
-                            required
-                          />
-                        </Autocomplete>
-                        {waypointInputList.length - 1 === index &&
-                          waypointInputList.length <= 4 && (
-                            <button
-                              type="submit"
-                              className={styles["add-stop-btn"]}
-                              onClick={handleWaypointAdd}
-                            >
-                              <AddCircleIcon />
-                            </button>
-                          )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </form>
             )}
           </div>
