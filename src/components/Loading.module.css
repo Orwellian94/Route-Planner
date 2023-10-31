@@ -1,0 +1,35 @@
+@font-face {
+  font-family: "poppinsbold";
+  src: url("./../assets/fonts/poppins-bold-webfont.woff2") format("woff2"),
+    url("./../assets/fonts/poppins-bold-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  color: #0a2342;
+  background-color: #fffdf7;
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10rem;
+  text-align: center;
+  animation: spin 5000ms infinite linear;
+}

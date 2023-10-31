@@ -172,12 +172,21 @@
   cursor: pointer;
   width: 40%;
   text-align: center;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btns .add-stop:hover {
+  background-color: #acdf20;
 }
 
 .btns button:first-of-type {
   width: 55%;
   background-color: #0a2342;
   color: #fffdf7;
+}
+
+.btns button:first-of-type:hover {
+  background-color: #041223;
 }
 
 .add-stop-btn,
@@ -188,6 +197,12 @@
   cursor: pointer;
   margin: 0;
   padding: 0;
+  transition: color 0.3s ease-in-out;
+}
+
+.add-stop-btn:hover,
+.remove-stop-btn:hover {
+  color: #041223;
 }
 
 .add-stop-btn {
@@ -196,4 +211,33 @@
 
 .remove-stop-btn {
   padding-right: 0.5rem;
+}
+
+/* Media queries for small and medium laptop screens */
+@media only screen and (min-width: 1025px) and (max-width: 1440px) {
+  .container {
+    width: 30%;
+  }
+}
+
+/* Media queries for tablets */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    width: 35%;
+  }
+
+  .expand {
+    font-size: 1.2rem;
+  }
+}
+
+/* Media queries for mobile phones */
+@media only screen and (max-width: 767px) {
+  .container {
+    width: 100%;
+    border-radius: 0px;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
 }

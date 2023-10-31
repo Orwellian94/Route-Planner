@@ -5,6 +5,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PlaceIcon from "@mui/icons-material/Place";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import Loading from "./Loading";
 import "./google-places-autocomplete.css";
 
 import {
@@ -15,43 +16,6 @@ import {
 } from "@react-google-maps/api";
 
 const libraries = ["places"];
-
-const Map = () => {
-  const center = { lat: 42.4414, lng: 19.2624 };
-
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "YOUR_API_KEY",
-    libraries: libraries,
-  });
-
-  if (!isLoaded) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  return (
-    <GoogleMap
-      center={center}
-      zoom={15}
-      mapContainerStyle={{
-        width: "100%",
-        height: "100%",
-      }}
-      options={{
-        zoomControl: false,
-        streetViewControl: false,
-        mapTypeControl: false,
-        fullscreenControl: false,
-      }}
-    />
-  );
-};
-
-export { Map };
 
 const RouteForm = (props) => {
   const originRef = useRef(null);
@@ -122,11 +86,7 @@ const RouteForm = (props) => {
   const center = { lat: 42.4414, lng: 19.2624 };
 
   if (!isLoaded) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   const handleWaypointAdd = () => {
@@ -168,9 +128,8 @@ const RouteForm = (props) => {
         path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
         fillColor: "#ff0000",
         fillOpacity: 1,
-        strokeColor: "white",
-        strokeWeight: 1,
-        scale: 10,
+        strokeWeight: 0,
+        scale: 6,
       },
     },
   };
