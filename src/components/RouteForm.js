@@ -131,8 +131,6 @@ const RouteForm = (props) => {
     const addresses = [...selectedAddresses];
     addresses.splice(index, 1);
     setSelectedAddresses(addresses);
-
-    calculateRoute();
   };
 
   const waypoints = selectedAddresses.filter((address) => address);
