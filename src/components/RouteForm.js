@@ -45,11 +45,6 @@ const RouteForm = (props) => {
 
   const handleRouteSubmit = (e) => {
     e.preventDefault();
-
-    console.log(
-      `Origin: ${origin}, Destination: ${destination}, Waypoints:`,
-      selectedAddresses
-    );
   };
 
   const toggleFormVisibility = () => {
