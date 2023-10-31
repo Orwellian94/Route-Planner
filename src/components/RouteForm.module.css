@@ -140,6 +140,7 @@
   font-size: 0.8rem;
   display: inline;
   width: 100%;
+  color: #0a2342;
 }
 
 .stop-container input {
@@ -213,14 +214,12 @@
   padding-right: 0.5rem;
 }
 
-/* Media queries for small and medium laptop screens */
 @media only screen and (min-width: 1025px) and (max-width: 1440px) {
   .container {
     width: 30%;
   }
 }
 
-/* Media queries for tablets */
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
   .container {
     width: 35%;
@@ -231,7 +230,6 @@
   }
 }
 
-/* Media queries for mobile phones */
 @media only screen and (max-width: 767px) {
   .container {
     width: 100%;
