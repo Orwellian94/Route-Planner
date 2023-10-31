@@ -1,4 +1,4 @@
-import { React, useRef, useState, Fragment, useEffect } from "react";
+import { React, useState, Fragment, useEffect } from "react";
 import styles from "./RouteForm.module.css";
 import KeyboardDoubleArrowDownRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowDownRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -6,6 +6,9 @@ import PlaceIcon from "@mui/icons-material/Place";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import Loading from "./Loading";
+import originPin from "./../assets/images/originPin.png";
+import destinationPin from "./../assets/images/destinationPin.png";
+import waypointPin from "./../assets/images/waypointPin.png";
 import "./google-places-autocomplete.css";
 
 import {
@@ -13,21 +16,24 @@ import {
   useJsApiLoader,
   Autocomplete,
   DirectionsRenderer,
+  Marker,
 } from "@react-google-maps/api";
 
 const libraries = ["places"];
 
 const RouteForm = (props) => {
-  const originRef = useRef(null);
-  const destinationRef = useRef(null);
-
+  const [origin, setOrigin] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [wpt, setWpt] = useState(null);
   const [stopContainerVisible, setStopContainerVisible] = useState(false);
   const [directionsRes, setDirectionsRes] = useState(null);
   const [routeFormVisible, setRouteFormVisible] = useState(false);
   const [waypointInputList, setWaypointInputList] = useState([
     { waypointInput: "" },
   ]);
-  const [searchResult, setSearchResult] = useState("");
+  const [originSearchResult, setOriginSearchResult] = useState(null);
+  const [destinationSearchResult, setDestinationSearchResult] = useState(null);
+  const [waypointSearchResult, setWaypointSearchResult] = useState(null);
   const [selectedAddresses, setSelectedAddresses] = useState([]);
   const [directionsRendererOptions, setDirectionsRendererOptions] = useState();
 
@@ -39,11 +45,6 @@ const RouteForm = (props) => {
 
   const handleRouteSubmit = (e) => {
     e.preventDefault();
-
-    const origin = originRef.current ? originRef.current.value : "";
-    const destination = destinationRef.current
-      ? destinationRef.current.value
-      : "";
 
     console.log(
       `Origin: ${origin}, Destination: ${destination}, Waypoints:`,
@@ -61,21 +62,48 @@ const RouteForm = (props) => {
     libraries: libraries,
   });
 
-  function onLoad(autocomplete) {
-    setSearchResult(autocomplete);
+  function onOriginLoad(autocomplete) {
+    setOriginSearchResult(autocomplete);
   }
 
-  function onPlaceChanged(index) {
-    if (searchResult != null) {
-      const place = searchResult.getPlace();
+  function onDestinationLoad(autocomplete) {
+    setDestinationSearchResult(autocomplete);
+  }
+
+  function onWaypointLoad(autocomplete) {
+    setWaypointSearchResult(autocomplete);
+  }
+
+  function onOriginChanged() {
+    if (originSearchResult != null) {
+      const place = originSearchResult.getPlace();
+      const location = place.geometry.location;
+      setOrigin({ lat: location.lat(), lng: location.lng() });
+    }
+  }
+
+  function onDestinationChanged() {
+    if (destinationSearchResult != null) {
+      const place = destinationSearchResult.getPlace();
+      const location = place.geometry.location;
+      setDestination({ lat: location.lat(), lng: location.lng() });
+    }
+  }
+
+  function onWaypointChanged(index) {
+    if (waypointSearchResult != null) {
+      const place = waypointSearchResult.getPlace();
+      const location = place.geometry.location;
       const formattedAddress = place.formatted_address;
       console.log(`Formatted Address: ${formattedAddress}`);
 
       const updatedAddresses = [...selectedAddresses];
       updatedAddresses[index] = formattedAddress;
       setSelectedAddresses(updatedAddresses);
-    } else {
-      alert("Please enter text");
+
+      const updatedWaypoints = [...waypoints];
+      updatedWaypoints[index] = { lat: location.lat(), lng: location.lng() };
+      setWpt(updatedWaypoints);
     }
   }
 
@@ -122,28 +150,19 @@ const RouteForm = (props) => {
       strokeOpacity: 0.8,
       strokeWeight: 5,
     },
-    markerOptions: {
-      icon: {
-        // eslint-disable-next-line no-undef
-        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-        fillColor: "#ff0000",
-        fillOpacity: 1,
-        strokeWeight: 0,
-        scale: 6,
-      },
-    },
+    suppressMarkers: true,
   };
 
   async function calculateRoute() {
-    if (originRef.current.value === "" || destinationRef.current.value === "") {
+    if (origin === "" || destination === "") {
       return;
     }
 
     // eslint-disable-next-line no-undef
     const directionService = new google.maps.DirectionsService();
     const results = await directionService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
+      origin: origin,
+      destination: destination,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
       waypoints: filteredWaypointLocations,
@@ -178,6 +197,34 @@ const RouteForm = (props) => {
               options={directionsRendererOptions}
             />
           )}
+          {origin && (
+            <Marker
+              position={origin}
+              icon={{
+                url: originPin,
+                scaledSize: new window.google.maps.Size(50, 50),
+              }}
+            />
+          )}
+          {destination && (
+            <Marker
+              position={destination}
+              icon={{
+                url: destinationPin,
+                scaledSize: new window.google.maps.Size(50, 50),
+              }}
+            />
+          )}
+          {waypoints.map((waypoint, index) => (
+            <Marker
+              key={index}
+              position={wpt[index]}
+              icon={{
+                url: waypointPin,
+                scaledSize: new window.google.maps.Size(50, 50),
+              }}
+            />
+          ))}
         </GoogleMap>
 
         <div className={styles.container}>
@@ -206,13 +253,12 @@ const RouteForm = (props) => {
                     <label>
                       <PlaceIcon />
                     </label>
-                    <Autocomplete className={styles.input}>
-                      <input
-                        type="text"
-                        placeholder="Origin"
-                        ref={originRef}
-                        required
-                      />
+                    <Autocomplete
+                      className={styles.input}
+                      onLoad={onOriginLoad}
+                      onPlaceChanged={onOriginChanged}
+                    >
+                      <input type="text" placeholder="Origin" required />
                     </Autocomplete>
                   </div>
                   <div className={styles["input2-container"]}>
@@ -221,14 +267,10 @@ const RouteForm = (props) => {
                     </label>
                     <Autocomplete
                       className={styles.input}
-                      pac-container={{ backgroundColor: "#beff0a" }}
+                      onLoad={onDestinationLoad}
+                      onPlaceChanged={onDestinationChanged}
                     >
-                      <input
-                        type="text"
-                        placeholder="Destination"
-                        ref={destinationRef}
-                        required
-                      />
+                      <input type="text" placeholder="Destination" required />
                     </Autocomplete>
                   </div>
                 </div>
@@ -247,8 +289,8 @@ const RouteForm = (props) => {
                           )}
                           <Autocomplete
                             className={styles.input}
-                            onPlaceChanged={() => onPlaceChanged(index)}
-                            onLoad={onLoad}
+                            onPlaceChanged={() => onWaypointChanged(index)}
+                            onLoad={onWaypointLoad}
                           >
                             <input
                               type="text"
