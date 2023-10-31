@@ -13,10 +13,11 @@ This project is a web application built with React that provids a user-friendly 
 How to use: Users can use this application to plan routes by typing in inputs an origin, destination, and single or multiple waypoints addresses. The project will display the route on a Google Map and show the directions to follow.
 
 # External Libraries Used in Project
+-  @mui/icons-material: Material-UI icons used for icons in the UI.
 
-@mui/icons-material: Material-UI icons used for icons in the UI.
-@react-google-maps/api: A library for integrating Google Maps with React.
-Other CSS files and image assets.
+-  @react-google-maps/api: A library for integrating Google Maps with React.
+
+-  Other CSS files and image assets.
 
 # Getting Started with Create React App
 
