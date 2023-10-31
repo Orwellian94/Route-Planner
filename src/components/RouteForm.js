@@ -53,7 +53,7 @@ const RouteForm = (props) => {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyBjizW_mGoQQI6jma6lTEWpaSsoYhKa6y8",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries: libraries,
   });
 
