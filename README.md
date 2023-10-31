@@ -21,7 +21,7 @@ How to use: Users can use this application to plan routes by typing in inputs an
 
 # Project Configuration
 
--The Google Maps API key is required for the project to work, and it should be included as googleMapsApiKey in the useJsApiLoader configuration instead of GOOGLE_MAPS_API_KEY value.
+-  The Google Maps API key is required for the project to work, and it should be included as googleMapsApiKey in the useJsApiLoader configuration instead of GOOGLE_MAPS_API_KEY value.
 
 # Getting Started with Create React App
 
